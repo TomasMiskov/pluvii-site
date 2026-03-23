@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { isLanguage, languages } from "../../../data/site";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: {
+      lang: project.data.lang,
+      slug: project.id.split("/").pop()?.replace(/\.md$/, "")
+    },
+    props: { project }
+  }));
+}
+
+const { lang } = Astro.params;
+
+if (!lang || !isLanguage(lang) || !languages.includes(lang)) {
+  return Astro.redirect("/en/");
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`Pluvii | ${project.data.title}`}
+  description={project.data.description}
+>
+  <section class="section shell">
+    <article class="project-shell">
+      {project.data.region && <p class="meta">{project.data.region}</p>}
+      <h1>{project.data.title}</h1>
+      <div class="project-copy">
+        <Content />
+      </div>
+    </article>
+  </section>
+</BaseLayout>

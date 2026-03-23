@@ -1,0 +1,54 @@
+---
+import { copy, type Language } from "../data/site";
+
+type Props = {
+  lang: Language;
+};
+
+const { lang } = Astro.props;
+const t = copy[lang];
+---
+
+<section class="hero shell">
+  <div class="hero-copy">
+    <p class="eyebrow">{t.hero.eyebrow}</p>
+    <h1>{t.hero.title}</h1>
+    <p class="lead">{t.hero.body}</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#contact-form">{t.hero.primaryCta}</a>
+      <a class="button button-secondary" href={`/${lang}/blog/`}>{t.hero.secondaryCta}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-heading">
+    <h2>{t.intro.title}</h2>
+    <p>{t.intro.body}</p>
+  </div>
+</section>
+
+<section class="section shell" id="contact-form">
+  <div class="contact-card">
+    <div class="section-heading">
+      <h2>{t.contact.title}</h2>
+      <p>{t.contact.body}</p>
+    </div>
+
+    <form class="contact-form">
+      <label>
+        <span>{t.contact.name}</span>
+        <input type="text" name="name" />
+      </label>
+      <label>
+        <span>{t.contact.email}</span>
+        <input type="email" name="email" />
+      </label>
+      <label>
+        <span>{t.contact.message}</span>
+        <textarea name="message" rows="5"></textarea>
+      </label>
+      <button class="button button-primary" type="submit">{t.contact.submit}</button>
+    </form>
+  </div>
+</section>

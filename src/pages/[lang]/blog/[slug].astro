@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { isLanguage, languages } from "../../../data/site";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: {
+      lang: post.data.lang,
+      slug: post.id.split("/").pop()?.replace(/\.md$/, "")
+    },
+    props: { post }
+  }));
+}
+
+const { lang } = Astro.params;
+
+if (!lang || !isLanguage(lang) || !languages.includes(lang)) {
+  return Astro.redirect("/en/");
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout lang={lang} title={`Pluvii | ${post.data.title}`} description={post.data.description}>
+  <section class="section shell">
+    <article class="post-shell">
+      <p class="meta">{post.data.publishDate.toISOString().slice(0, 10)}</p>
+      <h1>{post.data.title}</h1>
+      <div class="post-copy">
+        <Content />
+      </div>
+    </article>
+  </section>
+</BaseLayout>

@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { copy, isLanguage, languages } from "../../../data/site";
+
+export async function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+
+if (!lang || !isLanguage(lang)) {
+  return Astro.redirect("/en/");
+}
+
+const t = copy[lang];
+const projects = await getCollection("projects", ({ data }) => data.lang === lang);
+---
+
+<BaseLayout lang={lang} title={`Pluvii | ${t.projects.title}`}>
+  <section class="section shell">
+    <div class="section-heading">
+      <h1>{t.projects.title}</h1>
+      <p>{t.projects.intro}</p>
+    </div>
+  </section>
+
+  <section class="section shell">
+    <div class="content-list">
+      {projects.length === 0 ? (
+        <p>{t.projects.empty}</p>
+      ) : (
+        projects.map((project) => (
+          <article class="list-item">
+            {project.data.region && <p class="meta">{project.data.region}</p>}
+            <h2>
+              <a
+                href={`/${lang}/projects/${project.id.split("/").pop()?.replace(/\.md$/, "")}/`}
+              >
+                {project.data.title}
+              </a>
+            </h2>
+            <p>{project.data.description}</p>
+          </article>
+        ))
+      )}
+    </div>
+  </section>
+</BaseLayout>

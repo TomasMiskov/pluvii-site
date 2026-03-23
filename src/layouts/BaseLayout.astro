@@ -1,0 +1,60 @@
+---
+import "../styles/global.css";
+import { copy, languages, type Language } from "../data/site";
+
+type Props = {
+  lang: Language;
+  title: string;
+  description?: string;
+};
+
+const { lang, title, description = "Pluvii static website" } = Astro.props;
+const t = copy[lang];
+const languageLinks = languages.map((locale) => ({
+  code: locale,
+  label: copy[locale].localeLabel
+}));
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <a class="brand" href={`/${lang}/`}>Pluvii</a>
+        <nav class="nav">
+          <a href={`/${lang}/`}>{t.nav.home}</a>
+          <a href={`/${lang}/blog/`}>{t.nav.blog}</a>
+          <a href={`/${lang}/projects/`}>{t.nav.projects}</a>
+        </nav>
+        <div class="locale-switcher" aria-label="Language switcher">
+          {languageLinks.map((locale) => (
+            <a
+              class:list={["locale-link", locale.code === lang && "is-active"]}
+              href={`/${locale.code}/`}
+            >
+              {locale.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <p>Pluvii</p>
+        <p>{t.footer.contact}</p>
+      </div>
+    </footer>
+  </body>
+</html>
