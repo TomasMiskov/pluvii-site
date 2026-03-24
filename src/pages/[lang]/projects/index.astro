@@ -18,8 +18,9 @@ const projects = await getCollection("projects", ({ data }) => data.lang === lan
 ---
 
 <BaseLayout lang={lang} title={`Pluvii | ${t.projects.title}`}>
-  <section class="section shell">
-    <div class="section-heading">
+  <section class="page-hero shell">
+    <div class="page-hero-panel">
+      <p class="section-kicker">Projects</p>
       <h1>{t.projects.title}</h1>
       <p>{t.projects.intro}</p>
     </div>

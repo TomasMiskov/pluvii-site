@@ -21,17 +21,26 @@ const languageLinks = languages.map((locale) => ({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://rsms.me" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <title>{title}</title>
     <meta name="description" content={description} />
   </head>
   <body>
     <header class="site-header">
       <div class="shell">
-        <a class="brand" href={`/${lang}/`}>Pluvii</a>
+        <a class="brand" href={`/${lang}/`}>
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-copy">
+            <strong>Pluvii</strong>
+            <small>{t.siteTagline}</small>
+          </span>
+        </a>
         <nav class="nav">
           <a href={`/${lang}/`}>{t.nav.home}</a>
           <a href={`/${lang}/blog/`}>{t.nav.blog}</a>
           <a href={`/${lang}/projects/`}>{t.nav.projects}</a>
+          <a class="nav-cta" href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
         </nav>
         <div class="locale-switcher" aria-label="Language switcher">
           {languageLinks.map((locale) => (
@@ -52,7 +61,10 @@ const languageLinks = languages.map((locale) => ({
 
     <footer class="site-footer">
       <div class="shell footer-inner">
-        <p>Pluvii</p>
+        <div>
+          <p class="footer-brand">Pluvii</p>
+          <p class="footer-tagline">{t.siteTagline}</p>
+        </div>
         <p>{t.footer.contact}</p>
       </div>
     </footer>

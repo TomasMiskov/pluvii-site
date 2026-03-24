@@ -29,6 +29,7 @@ const { Content } = await render(post);
     <article class="post-shell">
       <p class="meta">{post.data.publishDate.toISOString().slice(0, 10)}</p>
       <h1>{post.data.title}</h1>
+      <p class="lead">{post.data.description}</p>
       <div class="post-copy">
         <Content />
       </div>

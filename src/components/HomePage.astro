@@ -10,27 +10,108 @@ const t = copy[lang];
 ---
 
 <section class="hero shell">
-  <div class="hero-copy">
-    <p class="eyebrow">{t.hero.eyebrow}</p>
-    <h1>{t.hero.title}</h1>
-    <p class="lead">{t.hero.body}</p>
-    <div class="hero-actions">
-      <a class="button button-primary" href="#contact-form">{t.hero.primaryCta}</a>
-      <a class="button button-secondary" href={`/${lang}/blog/`}>{t.hero.secondaryCta}</a>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">{t.hero.eyebrow}</p>
+      <h1>{t.hero.title}</h1>
+      <p class="lead">{t.hero.body}</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#contact-form">{t.hero.primaryCta}</a>
+        <a class="button button-secondary" href={`/${lang}/blog/`}>{t.hero.secondaryCta}</a>
+      </div>
+      <ul class="hero-points">
+        {t.hero.supportingPoints.map((point) => (
+          <li>{point}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="hero-visual" aria-label={t.hero.visualLabel}>
+      <div class="hero-stat">
+        <p>{t.hero.statLabel}</p>
+        <strong>{t.hero.statValue}</strong>
+      </div>
+      <div class="visual-card visual-card-map">
+        <span>{t.hero.visualLabel}</span>
+      </div>
+      <div class="visual-card visual-card-photo">
+        <span>Landscape context</span>
+      </div>
+      <div class="visual-card visual-card-diagram">
+        <span>Retention logic</span>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section shell">
-  <div class="section-heading">
-    <h2>{t.intro.title}</h2>
-    <p>{t.intro.body}</p>
+  <div class="section-heading section-heading-wide">
+    <p class="section-kicker">Why it feels different</p>
+    <h2>{t.home.intro.title}</h2>
+    <p>{t.home.intro.body}</p>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="principles-grid">
+    <div class="section-heading">
+      <p class="section-kicker">Brand principles</p>
+      <h2>{t.home.principles.title}</h2>
+      <p>{t.home.principles.body}</p>
+    </div>
+    <div class="feature-stack">
+      {t.home.principles.items.map((item, index) => (
+        <article class="feature-card">
+          <p class="feature-index">0{index + 1}</p>
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="media-showcase">
+    <div class="section-heading">
+      <p class="section-kicker">Visual direction</p>
+      <h2>{t.home.media.title}</h2>
+      <p>{t.home.media.body}</p>
+    </div>
+    <div class="media-grid">
+      {t.home.media.cards.map((card, index) => (
+        <article class:list={["media-card", `media-card-${index + 1}`]}>
+          <div class="media-frame" aria-hidden="true"></div>
+          <h3>{card.title}</h3>
+          <p>{card.body}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="pathways-panel">
+    <div class="section-heading section-heading-wide">
+      <p class="section-kicker">How the site should scale</p>
+      <h2>{t.home.pathways.title}</h2>
+      <p>{t.home.pathways.body}</p>
+    </div>
+    <div class="pathways-grid">
+      {t.home.pathways.items.map((item) => (
+        <article class="pathway-card">
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
   </div>
 </section>
 
 <section class="section shell" id="contact-form">
   <div class="contact-card">
     <div class="section-heading">
+      <p class="section-kicker">{t.nav.contact}</p>
       <h2>{t.contact.title}</h2>
       <p>{t.contact.body}</p>
     </div>

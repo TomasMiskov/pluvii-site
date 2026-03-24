@@ -33,6 +33,7 @@ const { Content } = await render(project);
     <article class="project-shell">
       {project.data.region && <p class="meta">{project.data.region}</p>}
       <h1>{project.data.title}</h1>
+      <p class="lead">{project.data.description}</p>
       <div class="project-copy">
         <Content />
       </div>
