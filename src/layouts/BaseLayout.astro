@@ -10,10 +10,28 @@ type Props = {
 
 const { lang, title, description = "Pluvii static website" } = Astro.props;
 const t = copy[lang];
+const pathname = Astro.url.pathname;
+const createLocaleHref = (locale: Language) => {
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (segments.length === 0) {
+    return `/${locale}/`;
+  }
+
+  if (languages.includes(segments[0] as Language)) {
+    segments[0] = locale;
+    return `/${segments.join("/")}/`;
+  }
+
+  return `/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+};
+
 const languageLinks = languages.map((locale) => ({
   code: locale,
-  label: copy[locale].localeLabel
+  label: copy[locale].localeLabel,
+  href: createLocaleHref(locale)
 }));
+const currentLocale = languageLinks.find((locale) => locale.code === lang);
 ---
 
 <!doctype html>
@@ -23,6 +41,8 @@ const languageLinks = languages.map((locale) => ({
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://rsms.me" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon-green-blue.svg" />
+    <link rel="shortcut icon" href="/favicons/favicon-green-blue.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
   </head>
@@ -30,27 +50,53 @@ const languageLinks = languages.map((locale) => ({
     <header class="site-header">
       <div class="shell">
         <a class="brand" href={`/${lang}/`}>
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span class="brand-copy">
+          <img
+            class="brand-logo"
+            src="/brand/logo-green-blue.svg"
+            alt="Pluvii"
+            width="250"
+            height="125"
+          />
+          <span class="brand-copy sr-only">
             <strong>Pluvii</strong>
             <small>{t.siteTagline}</small>
           </span>
         </a>
-        <nav class="nav">
-          <a href={`/${lang}/`}>{t.nav.home}</a>
-          <a href={`/${lang}/blog/`}>{t.nav.blog}</a>
-          <a href={`/${lang}/projects/`}>{t.nav.projects}</a>
-          <a class="nav-cta" href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
-        </nav>
-        <div class="locale-switcher" aria-label="Language switcher">
-          {languageLinks.map((locale) => (
-            <a
-              class:list={["locale-link", locale.code === lang && "is-active"]}
-              href={`/${locale.code}/`}
-            >
-              {locale.label}
-            </a>
-          ))}
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-panel"
+          aria-label="Toggle navigation"
+          data-menu-toggle
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="site-panel" id="site-panel" data-site-panel>
+          <nav class="nav">
+            <a href={`/${lang}/`}>{t.nav.home}</a>
+            <a href={`/${lang}/blog/`}>{t.nav.blog}</a>
+            <a href={`/${lang}/projects/`}>{t.nav.projects}</a>
+            <a class="nav-cta" href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
+          </nav>
+          <details class="locale-dropdown">
+            <summary class="locale-summary">
+              <span>{currentLocale?.label}</span>
+              <span class="locale-caret" aria-hidden="true"></span>
+            </summary>
+            <div class="locale-menu" aria-label="Language switcher">
+              {languageLinks.map((locale) => (
+                <a
+                  class:list={["locale-link", locale.code === lang && "is-active"]}
+                  href={locale.href}
+                >
+                  {locale.label}
+                </a>
+              ))}
+            </div>
+          </details>
         </div>
       </div>
     </header>
@@ -68,5 +114,47 @@ const languageLinks = languages.map((locale) => ({
         <p>{t.footer.contact}</p>
       </div>
     </footer>
+    <script is:inline>
+      const menuToggle = document.querySelector("[data-menu-toggle]");
+      const sitePanel = document.querySelector("[data-site-panel]");
+      const mobileQuery = window.matchMedia("(max-width: 900px)");
+
+      if (menuToggle instanceof HTMLButtonElement && sitePanel instanceof HTMLElement) {
+        const closeMenu = () => {
+          menuToggle.setAttribute("aria-expanded", "false");
+          sitePanel.dataset.open = "false";
+          document.body.classList.remove("menu-open");
+        };
+
+        const toggleMenu = () => {
+          const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+          menuToggle.setAttribute("aria-expanded", String(!isOpen));
+          sitePanel.dataset.open = String(!isOpen);
+          document.body.classList.toggle("menu-open", !isOpen);
+        };
+
+        menuToggle.addEventListener("click", toggleMenu);
+
+        sitePanel.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            if (mobileQuery.matches) {
+              closeMenu();
+            }
+          });
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            closeMenu();
+          }
+        });
+
+        mobileQuery.addEventListener("change", (event) => {
+          if (!event.matches) {
+            closeMenu();
+          }
+        });
+      }
+    </script>
   </body>
 </html>

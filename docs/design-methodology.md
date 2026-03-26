@@ -96,13 +96,13 @@ The default feel should be light, fresh, and optimistic.
 
 These values are a starting point, not a rigid final brand lockup:
 
-- Sky Blue: `#BFE7F2`
-- Soft Blue: `#DDF4FA`
-- Leaf Green: `#CFE8C6`
-- Soft Green: `#E7F4E1`
+- Water Blue: `#79D8F3`
+- Soft Blue: `#C0F1FF`
+- Leaf Green: `#A4E38E`
+- Soft Green: `#D2F3C6`
 - White: `#FFFFFF`
-- Near Black: `#111111`
-- Mist Gray: `#F4F7F8`
+- Near Black: `#1E1E1E`
+- Mist Gray: `#DCDEDE`
 
 ### Usage guidance
 
