@@ -9,114 +9,57 @@ const { lang } = Astro.props;
 const t = copy[lang];
 ---
 
-<section class="hero shell">
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow">{t.hero.eyebrow}</p>
-      <h1>{t.hero.title}</h1>
-      <p class="lead">{t.hero.body}</p>
-      <div class="hero-actions">
-        <a class="button button-primary" href="#contact-form">{t.hero.primaryCta}</a>
-        <a class="button button-secondary" href={`/${lang}/blog/`}>{t.hero.secondaryCta}</a>
-      </div>
-      <ul class="hero-points">
-        {t.hero.supportingPoints.map((point) => (
-          <li>{point}</li>
-        ))}
-      </ul>
-    </div>
-
-    <div class="hero-visual" aria-label={t.hero.visualLabel}>
-      <div class="hero-stat">
-        <p>{t.hero.statLabel}</p>
-        <strong>{t.hero.statValue}</strong>
-      </div>
-      <div class="visual-card visual-card-map">
-        <span>{t.hero.visualLabel}</span>
-      </div>
-      <div class="visual-card visual-card-photo">
-        <span>Landscape context</span>
-      </div>
-      <div class="visual-card visual-card-diagram">
-        <span>Retention logic</span>
-      </div>
+<section class="hero hero-centered shell">
+  <div class="hero-simple">
+    <p class="eyebrow">{t.hero.eyebrow}</p>
+    <h1>{t.hero.title}</h1>
+    <p class="lead">{t.hero.body}</p>
+    <div class="hero-actions hero-actions-centered">
+      <a class="button button-primary" href="#contact-form">{t.hero.primaryCta}</a>
     </div>
   </div>
 </section>
 
 <section class="section shell">
-  <div class="section-heading section-heading-wide">
-    <p class="section-kicker">Why it feels different</p>
-    <h2>{t.home.intro.title}</h2>
-    <p>{t.home.intro.body}</p>
+  <div class="section-heading section-heading-center">
+    <h2>{t.home.process.title}</h2>
+  </div>
+  <div class="process-grid">
+    {t.home.process.items.map((item, index) => (
+      <article class="process-card">
+        <p class="feature-index">0{index + 1}</p>
+        <h3>{item.title}</h3>
+        <p>{item.body}</p>
+      </article>
+    ))}
   </div>
 </section>
 
 <section class="section shell">
-  <div class="principles-grid">
-    <div class="section-heading">
-      <p class="section-kicker">Brand principles</p>
-      <h2>{t.home.principles.title}</h2>
-      <p>{t.home.principles.body}</p>
+  <div class="faq-shell">
+    <div class="section-heading section-heading-center">
+      <h2>{t.home.faq.title}</h2>
     </div>
-    <div class="feature-stack">
-      {t.home.principles.items.map((item, index) => (
-        <article class="feature-card">
-          <p class="feature-index">0{index + 1}</p>
-          <h3>{item.title}</h3>
+    <div class="faq-list">
+      {t.home.faq.items.map((item) => (
+        <details class="faq-item">
+          <summary>{item.title}</summary>
           <p>{item.body}</p>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>
-
-<section class="section shell">
-  <div class="media-showcase">
-    <div class="section-heading">
-      <p class="section-kicker">Visual direction</p>
-      <h2>{t.home.media.title}</h2>
-      <p>{t.home.media.body}</p>
-    </div>
-    <div class="media-grid">
-      {t.home.media.cards.map((card, index) => (
-        <article class:list={["media-card", `media-card-${index + 1}`]}>
-          <div class="media-frame" aria-hidden="true"></div>
-          <h3>{card.title}</h3>
-          <p>{card.body}</p>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>
-
-<section class="section shell">
-  <div class="pathways-panel">
-    <div class="section-heading section-heading-wide">
-      <p class="section-kicker">How the site should scale</p>
-      <h2>{t.home.pathways.title}</h2>
-      <p>{t.home.pathways.body}</p>
-    </div>
-    <div class="pathways-grid">
-      {t.home.pathways.items.map((item) => (
-        <article class="pathway-card">
-          <h3>{item.title}</h3>
-          <p>{item.body}</p>
-        </article>
+        </details>
       ))}
     </div>
   </div>
 </section>
 
 <section class="section shell" id="contact-form">
-  <div class="contact-card">
-    <div class="section-heading">
+  <div class="contact-card contact-card-centered">
+    <div class="section-heading section-heading-center">
       <p class="section-kicker">{t.nav.contact}</p>
       <h2>{t.contact.title}</h2>
       <p>{t.contact.body}</p>
     </div>
 
-    <form class="contact-form">
+    <form class="contact-form contact-form-simple">
       <label>
         <span>{t.contact.name}</span>
         <input type="text" name="name" />
@@ -126,6 +69,10 @@ const t = copy[lang];
         <input type="email" name="email" />
       </label>
       <label>
+        <span>{t.contact.phone}</span>
+        <input type="tel" name="phone" />
+      </label>
+      <label class="contact-form-full">
         <span>{t.contact.message}</span>
         <textarea name="message" rows="5"></textarea>
       </label>
