@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { copy, isLanguage, languages, type Language } from "../../../data/site";
+
+type Audience = "landowners" | "farmers" | "municipalities";
+const audienceIds: Audience[] = ["landowners", "farmers", "municipalities"];
+
+const audienceContent: Record<
+  Language,
+  Record<
+    Audience,
+    {
+      title: string;
+      body: string;
+      placeholderTitle: string;
+      placeholderBody: string;
+    }
+  >
+> = {
+  en: {
+    landowners: {
+      title: "For Land Owners",
+      body: "Placeholder page for private and family landowners who want practical guidance on water retention and land regeneration.",
+      placeholderTitle: "Audience page in progress",
+      placeholderBody: "We will add concrete examples, expected deliverables, and a typical first-step workflow for landowners."
+    },
+    farmers: {
+      title: "For Farmers",
+      body: "Placeholder page for farmers who want resilient water systems that support long-term soil health and production stability.",
+      placeholderTitle: "Audience page in progress",
+      placeholderBody: "We will add farming-specific outcomes, suitable interventions, and planning considerations for active operations."
+    },
+    municipalities: {
+      title: "For Municipalities",
+      body: "Placeholder page for municipal teams planning landscape-scale retention and restoration across public land and shared catchments.",
+      placeholderTitle: "Audience page in progress",
+      placeholderBody: "We will add collaboration models, project scopes, and implementation paths for municipal and regional contexts."
+    }
+  },
+  sk: {
+    landowners: {
+      title: "Pre Vlastnikov Pozemkov",
+      body: "Docasna stranka pre sukromnych vlastnikov pozemkov, ktori hladaju prakticky postup pri zadrzani vody a regeneracii krajiny.",
+      placeholderTitle: "Stranka je vo priprave",
+      placeholderBody: "Doplnime sem konkretne priklady, vystupy spoluprace a bezny uvodny postup pre vlastnikov."
+    },
+    farmers: {
+      title: "Pre Farmarov",
+      body: "Docasna stranka pre farmarov, ktori chcu posilnit odolnost hospodarenia cez lepsie hospodarenie s vodou a stav pody.",
+      placeholderTitle: "Stranka je vo priprave",
+      placeholderBody: "Doplnime sem farmarske scenare, vhodne opatrenia a prakticke kroky pre fungujucu prevadzku."
+    },
+    municipalities: {
+      title: "Pre Samospravy",
+      body: "Docasna stranka pre samospravy, ktore pripravuju retencne a obnovne opatrenia vo vacsom uzemnom kontexte.",
+      placeholderTitle: "Stranka je vo priprave",
+      placeholderBody: "Doplnime sem modely spoluprace, rozsahy projektov a postupy implementacie pre obce a regiony."
+    }
+  }
+};
+
+export function getStaticPaths() {
+  const audiences: Audience[] = ["landowners", "farmers", "municipalities"];
+
+  return languages.flatMap((lang) =>
+    audiences.map((audience) => ({
+      params: { lang, audience }
+    }))
+  );
+}
+
+const { lang, audience } = Astro.params;
+
+if (!lang || !isLanguage(lang) || !audience || !audienceIds.includes(audience as Audience)) {
+  return Astro.redirect("/en/");
+}
+
+const typedAudience = audience as Audience;
+const t = copy[lang];
+const page = audienceContent[lang][typedAudience];
+---
+
+<BaseLayout lang={lang} title={`Pluvii | ${t.nav.whoItsFor} | ${t.nav[typedAudience]}`}>
+  <section class="page-hero shell">
+    <div class="page-hero-panel">
+      <p class="eyebrow">{t.nav.whoItsFor}</p>
+      <h1>{page.title}</h1>
+      <p class="lead">{page.body}</p>
+    </div>
+  </section>
+
+  <section class="section shell">
+    <div class="content-list">
+      <article class="list-item">
+        <h2>{page.placeholderTitle}</h2>
+        <p>{page.placeholderBody}</p>
+        <a href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

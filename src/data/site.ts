@@ -12,6 +12,11 @@ type Dictionary = {
     blog: string;
     projects: string;
     contact: string;
+    whoItsFor: string;
+    resources: string;
+    landowners: string;
+    farmers: string;
+    municipalities: string;
   };
   hero: {
     eyebrow: string;
@@ -67,12 +72,17 @@ export const copy: Record<Language, Dictionary> = {
       home: "Home",
       blog: "Blog",
       projects: "Projects",
-      contact: "Contact"
+      contact: "Contact",
+      whoItsFor: "Who it's for",
+      resources: "Resources",
+      landowners: "Land owners",
+      farmers: "Farmers",
+      municipalities: "Municipalities"
     },
     hero: {
       eyebrow: "Landscape, water, and regeneration",
       title: "We map your water so you can restore your land.",
-      body: "Pluvii helps you understand how water moves across your land, where it gathers, and which retention measures will do the most good for restoration.",
+      body: "Pluvii helps you understand how water moves across your land, where it pools, and which retention measures will be most effective.",
       primaryCta: "Let's Talk"
     },
     home: {
@@ -80,12 +90,12 @@ export const copy: Record<Language, Dictionary> = {
         title: "This is How We Work",
         items: [
           {
-            title: "We gather the land data",
-            body: "We start with publicly available LiDAR and terrain data for your site so we can build a clear picture of the land underneath the surface story."
+            title: "We gather land elevation data",
+            body: "We start with publicly available terrain (LiDAR) data for your site."
           },
           {
             title: "We trace how water behaves",
-            body: "We run our analysis to reveal where water slows, pools, spills, and concentrates, so hidden patterns become visible."
+            body: "We run our analysis to reveal where water slows, pools, spills, and concentrates."
           },
           {
             title: "We show what to build and where",
@@ -141,7 +151,12 @@ export const copy: Record<Language, Dictionary> = {
       home: "Domov",
       blog: "Blog",
       projects: "Projekty",
-      contact: "Kontakt"
+      contact: "Kontakt",
+      whoItsFor: "Pre koho",
+      resources: "Zdroje",
+      landowners: "Vlastnici pozemkov",
+      farmers: "Farmari",
+      municipalities: "Samospravy"
     },
     hero: {
       eyebrow: "Krajina, voda a regeneracia",

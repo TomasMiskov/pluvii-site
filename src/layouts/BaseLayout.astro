@@ -32,6 +32,38 @@ const languageLinks = languages.map((locale) => ({
   href: createLocaleHref(locale)
 }));
 const currentLocale = languageLinks.find((locale) => locale.code === lang);
+const navGroups = [
+  {
+    label: t.nav.whoItsFor,
+    links: [
+      {
+        label: t.nav.landowners,
+        href: `/${lang}/who-its-for/landowners/`
+      },
+      {
+        label: t.nav.farmers,
+        href: `/${lang}/who-its-for/farmers/`
+      },
+      {
+        label: t.nav.municipalities,
+        href: `/${lang}/who-its-for/municipalities/`
+      }
+    ]
+  },
+  {
+    label: t.nav.resources,
+    links: [
+      {
+        label: t.nav.blog,
+        href: `/${lang}/blog/`
+      },
+      {
+        label: t.nav.projects,
+        href: `/${lang}/projects/`
+      }
+    ]
+  }
+];
 ---
 
 <!doctype html>
@@ -76,10 +108,19 @@ const currentLocale = languageLinks.find((locale) => locale.code === lang);
         </button>
         <div class="site-panel" id="site-panel" data-site-panel>
           <nav class="nav">
-            <a href={`/${lang}/`}>{t.nav.home}</a>
-            <a href={`/${lang}/blog/`}>{t.nav.blog}</a>
-            <a href={`/${lang}/projects/`}>{t.nav.projects}</a>
-            <a class="nav-cta" href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
+            {navGroups.map((group) => (
+              <div class="nav-dropdown" data-nav-dropdown data-open="false">
+                <button class="nav-trigger" type="button" data-nav-trigger>
+                  <span>{group.label}</span>
+                  <span class="nav-caret" aria-hidden="true"></span>
+                </button>
+                <div class="nav-menu">
+                  {group.links.map((item) => (
+                    <a href={item.href}>{item.label}</a>
+                  ))}
+                </div>
+              </div>
+            ))}
           </nav>
           <details class="locale-dropdown">
             <summary class="locale-summary">
@@ -120,10 +161,26 @@ const currentLocale = languageLinks.find((locale) => locale.code === lang);
       const mobileQuery = window.matchMedia("(max-width: 900px)");
 
       if (menuToggle instanceof HTMLButtonElement && sitePanel instanceof HTMLElement) {
+        const closeLocaleDropdown = () => {
+          sitePanel.querySelectorAll(".locale-dropdown[open]").forEach((dropdown) => {
+            dropdown.removeAttribute("open");
+          });
+        };
+
+        const closeNavDropdowns = () => {
+          sitePanel.querySelectorAll("[data-nav-dropdown]").forEach((dropdown) => {
+            if (dropdown instanceof HTMLElement) {
+              dropdown.dataset.open = "false";
+            }
+          });
+        };
+
         const closeMenu = () => {
           menuToggle.setAttribute("aria-expanded", "false");
           sitePanel.dataset.open = "false";
           document.body.classList.remove("menu-open");
+          closeNavDropdowns();
+          closeLocaleDropdown();
         };
 
         const toggleMenu = () => {
@@ -134,6 +191,29 @@ const currentLocale = languageLinks.find((locale) => locale.code === lang);
         };
 
         menuToggle.addEventListener("click", toggleMenu);
+
+        sitePanel.querySelectorAll("[data-nav-trigger]").forEach((trigger) => {
+          if (!(trigger instanceof HTMLButtonElement)) {
+            return;
+          }
+
+          trigger.addEventListener("click", (event) => {
+            if (!mobileQuery.matches) {
+              return;
+            }
+
+            event.preventDefault();
+            const dropdown = trigger.closest("[data-nav-dropdown]");
+
+            if (!(dropdown instanceof HTMLElement)) {
+              return;
+            }
+
+            const willOpen = dropdown.dataset.open !== "true";
+            closeNavDropdowns();
+            dropdown.dataset.open = String(willOpen);
+          });
+        });
 
         sitePanel.querySelectorAll("a").forEach((link) => {
           link.addEventListener("click", () => {
