@@ -1,0 +1,498 @@
+---
+import type { HeroMapSceneEntry } from "../data/mapScenes";
+
+type Props = {
+  scene: HeroMapSceneEntry;
+};
+
+const { scene } = Astro.props;
+const mapApiKey = import.meta.env.PUBLIC_MAP_API_KEY ?? "";
+---
+
+<div
+  class="hero-map-shell"
+  data-hero-map
+  data-scene-id={scene.id}
+  data-scene-url={scene.sceneUrl}
+  data-map-key={mapApiKey}
+  data-initial-opacity="70"
+>
+  <div class="hero-map-frame" data-map-frame>
+    <div class="hero-map-canvas hero-map-base" data-map-base></div>
+    <div class="hero-map-loading" data-map-loading>
+      <span class="hero-map-loading-droplet" aria-hidden="true"></span>
+      <span>Loading map...</span>
+    </div>
+    <p class="hero-map-fallback" data-map-fallback hidden>
+      Interactive map is not available on this device yet.
+    </p>
+  </div>
+
+  <div class="hero-map-opacity-control">
+    <label class="hero-map-range-label" for={`hero-map-range-${scene.id}`}>Water overlay</label>
+    <input
+      class="hero-map-range"
+      id={`hero-map-range-${scene.id}`}
+      type="range"
+      min="0"
+      max="100"
+      value="70"
+      data-map-range
+    />
+  </div>
+</div>
+
+<script>
+  // @ts-nocheck
+  (() => {
+    const roots = document.querySelectorAll("[data-hero-map]");
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const hasWebGLSupport = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        return Boolean(
+          window.WebGLRenderingContext &&
+            (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+        );
+      } catch {
+        return false;
+      }
+    };
+
+    const toBounds = (bounds) => {
+      if (!Array.isArray(bounds) || bounds.length !== 4) {
+        return null;
+      }
+
+      return [
+        [Number(bounds[0]), Number(bounds[1])],
+        [Number(bounds[2]), Number(bounds[3])]
+      ];
+    };
+
+    const expandBounds = (bounds, paddingRatio) => {
+      if (!Array.isArray(bounds) || bounds.length !== 2) {
+        return null;
+      }
+
+      const west = Number(bounds[0][0]);
+      const south = Number(bounds[0][1]);
+      const east = Number(bounds[1][0]);
+      const north = Number(bounds[1][1]);
+
+      const ratio = clamp(Number(paddingRatio), 0, 1);
+      const lngPad = (east - west) * ratio;
+      const latPad = (north - south) * ratio;
+
+      return [
+        [west - lngPad, south - latPad],
+        [east + lngPad, north + latPad]
+      ];
+    };
+
+    const buildStyleUrl = (sceneConfig, apiKey) => {
+      if (!apiKey) {
+        return "https://demotiles.maplibre.org/style.json";
+      }
+
+      const styleId = sceneConfig?.style?.maptilerStyleId || "outdoor-v2";
+      return `https://api.maptiler.com/maps/${encodeURIComponent(styleId)}/style.json?key=${encodeURIComponent(apiKey)}`;
+    };
+
+    const addTerrain = (map, sceneConfig, apiKey) => {
+      if (!apiKey || map.getSource("pluvii-terrain")) {
+        return;
+      }
+
+      map.addSource("pluvii-terrain", {
+        type: "raster-dem",
+        tiles: [
+          `https://api.maptiler.com/tiles/terrain-rgb-v2/{z}/{x}/{y}.webp?key=${encodeURIComponent(apiKey)}`
+        ],
+        tileSize: 256,
+        maxzoom: 14
+      });
+
+      map.setTerrain({
+        source: "pluvii-terrain",
+        exaggeration: Number(sceneConfig?.style?.terrainExaggeration || 1)
+      });
+    };
+
+    const addAoiLayers = (map, sceneConfig) => {
+      if (!sceneConfig?.boundaryUrl) {
+        return;
+      }
+
+      if (sceneConfig.maskUrl && !map.getSource("pluvii-aoi-mask")) {
+        map.addSource("pluvii-aoi-mask", {
+          type: "geojson",
+          data: sceneConfig.maskUrl
+        });
+
+        map.addLayer({
+          id: "pluvii-aoi-mask-fill",
+          type: "fill",
+          source: "pluvii-aoi-mask",
+          paint: {
+            "fill-color": "rgba(20, 24, 28, 0.28)"
+          }
+        });
+      }
+
+      if (!map.getSource("pluvii-aoi-boundary")) {
+        map.addSource("pluvii-aoi-boundary", {
+          type: "geojson",
+          data: sceneConfig.boundaryUrl
+        });
+
+        map.addLayer({
+          id: "pluvii-aoi-boundary-line",
+          type: "line",
+          source: "pluvii-aoi-boundary",
+          paint: {
+            "line-color": "#1f3038",
+            "line-width": 2.2,
+            "line-opacity": 0.9
+          }
+        });
+      }
+    };
+
+    const addOverlayLayer = (map, sceneConfig, initialOpacity) => {
+      const overlay = sceneConfig?.overlay;
+      if (!overlay) {
+        return null;
+      }
+
+      const alpha = clamp(Number(initialOpacity), 0, 100) / 100;
+
+      if (overlay.type === "image-raster") {
+        const sourceId = "pluvii-overlay-image";
+        const layerId = "pluvii-overlay-raster";
+
+        if (!map.getSource(sourceId)) {
+          map.addSource(sourceId, {
+            type: "image",
+            url: overlay.url,
+            coordinates: overlay.coordinates
+          });
+        }
+
+        if (!map.getLayer(layerId)) {
+          map.addLayer({
+            id: layerId,
+            type: "raster",
+            source: sourceId,
+            paint: {
+              "raster-opacity": alpha
+            }
+          });
+        }
+
+        return { layerId, property: "raster-opacity" };
+      }
+
+      if (overlay.type === "geojson-heat") {
+        const sourceId = "pluvii-overlay-source";
+        const layerId = "pluvii-overlay-fill";
+        const outlineId = "pluvii-overlay-outline";
+
+        if (!map.getSource(sourceId)) {
+          map.addSource(sourceId, {
+            type: "geojson",
+            data: overlay.url
+          });
+        }
+
+        if (!map.getLayer(layerId)) {
+          map.addLayer({
+            id: layerId,
+            type: "fill",
+            source: sourceId,
+            paint: {
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", overlay.valueProperty], 0],
+                Number(overlay.min || 0),
+                "rgba(108, 196, 236, 0.2)",
+                Number((overlay.min + overlay.max) / 2 || 0.5),
+                "rgba(64, 169, 216, 0.48)",
+                Number(overlay.max || 1),
+                "rgba(18, 115, 173, 0.72)"
+              ],
+              "fill-opacity": alpha
+            }
+          });
+        }
+
+        if (!map.getLayer(outlineId)) {
+          map.addLayer({
+            id: outlineId,
+            type: "line",
+            source: sourceId,
+            paint: {
+              "line-color": "rgba(6, 59, 93, 0.85)",
+              "line-width": 1.3
+            }
+          });
+        }
+
+        return { layerId, property: "fill-opacity" };
+      }
+
+      return null;
+    };
+
+    const setOverlayOpacity = (map, overlayRef, percent) => {
+      if (!map || !overlayRef) {
+        return;
+      }
+
+      const alpha = clamp(Number(percent), 0, 100) / 100;
+      map.setPaintProperty(overlayRef.layerId, overlayRef.property, alpha);
+    };
+
+    const applyInitialViewFromBounds = (map, bounds, camera) => {
+      const desiredBearing = Number(camera?.bearing || 0);
+      const desiredPitch = Number(camera?.pitch || 0);
+      const desiredZoom = Number(camera?.zoom || 15);
+      const configuredMinZoom = Number(camera?.minZoom || 11);
+      const shouldFitBounds =
+        Boolean(bounds) &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(max-width: 900px)").matches;
+
+      if (!shouldFitBounds) {
+        map.jumpTo({
+          center: camera?.center || [17.1135, 48.1425],
+          zoom: desiredZoom,
+          bearing: desiredBearing,
+          pitch: desiredPitch
+        });
+        map.setMinZoom(configuredMinZoom);
+        return;
+      }
+
+      map.fitBounds(bounds, {
+        padding: {
+          top: 48,
+          right: 48,
+          bottom: 48,
+          left: 48
+        },
+        bearing: desiredBearing,
+        pitch: desiredPitch,
+        maxZoom: desiredZoom,
+        duration: 0
+      });
+
+      // Keep the configured minimum when possible, but do not force a tighter zoom on smaller screens.
+      map.setMinZoom(Math.min(configuredMinZoom, map.getZoom()));
+    };
+
+    const loadMapLibreFromScript = async () => {
+      if (window.maplibregl) {
+        return window.maplibregl;
+      }
+
+      if (!window.__pluviiMapLibrePromise) {
+        window.__pluviiMapLibrePromise = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdn.jsdelivr.net/npm/maplibre-gl@5.21.1/dist/maplibre-gl.js";
+          script.async = true;
+          script.crossOrigin = "anonymous";
+          script.onload = () => {
+            if (window.maplibregl) {
+              resolve(window.maplibregl);
+              return;
+            }
+
+            reject(new Error("MapLibre global was not available after script load."));
+          };
+          script.onerror = () => reject(new Error("Could not load MapLibre script."));
+          document.head.append(script);
+        });
+      }
+
+      return window.__pluviiMapLibrePromise;
+    };
+
+    const loadMapLibre = async () => {
+      try {
+        const maplibreModule = await import("maplibre-gl");
+        return maplibreModule.default;
+      } catch {
+        return loadMapLibreFromScript();
+      }
+    };
+
+    roots.forEach((root) => {
+      if (!(root instanceof HTMLElement)) {
+        return;
+      }
+
+      const frame = root.querySelector("[data-map-frame]");
+      const baseNode = root.querySelector("[data-map-base]");
+      const range = root.querySelector("[data-map-range]");
+      const loading = root.querySelector("[data-map-loading]");
+      const fallback = root.querySelector("[data-map-fallback]");
+
+      if (
+        !(frame instanceof HTMLElement) ||
+        !(baseNode instanceof HTMLElement) ||
+        !(range instanceof HTMLInputElement)
+      ) {
+        return;
+      }
+
+      let opacityValue = clamp(Number(root.dataset.initialOpacity || 70), 0, 100);
+      range.value = String(Math.round(opacityValue));
+
+      const sceneUrl = root.dataset.sceneUrl;
+      const mapApiKey = root.dataset.mapKey || "";
+
+      const showFallback = (message) => {
+        if (fallback instanceof HTMLElement) {
+          fallback.textContent = message;
+          fallback.hidden = false;
+        }
+
+        if (loading instanceof HTMLElement) {
+          loading.style.display = "none";
+        }
+      };
+
+      const hideLoading = () => {
+        if (loading instanceof HTMLElement) {
+          loading.style.display = "none";
+        }
+      };
+
+      const loadInteractiveMap = async () => {
+        if (!hasWebGLSupport()) {
+          showFallback("Interactive map needs WebGL support.");
+          return;
+        }
+
+        if (!sceneUrl) {
+          showFallback("Map scene configuration is missing.");
+          return;
+        }
+
+        let sceneConfig;
+
+        try {
+          const response = await fetch(sceneUrl, { credentials: "same-origin" });
+          if (!response.ok) {
+            throw new Error(`Map scene request failed: ${response.status}`);
+          }
+
+          sceneConfig = await response.json();
+        } catch {
+          showFallback("Could not load map scene configuration.");
+          return;
+        }
+
+        let maplibregl;
+
+        try {
+          maplibregl = await loadMapLibre();
+        } catch {
+          showFallback("Could not load interactive map library.");
+          return;
+        }
+
+        const camera = sceneConfig.camera || {};
+        const bounds = toBounds(sceneConfig.bounds);
+        const restrictBounds = sceneConfig?.restrictBounds === true;
+        const maxBoundsPaddingRatio = Number(sceneConfig?.maxBoundsPaddingRatio ?? 0.18);
+        const maxBounds = bounds ? expandBounds(bounds, maxBoundsPaddingRatio) : null;
+
+        const mapOptions = {
+          style: buildStyleUrl(sceneConfig, mapApiKey),
+          center: camera.center || [17.1135, 48.1425],
+          zoom: Number(camera.zoom || 13.4),
+          pitch: Number(camera.pitch || 52),
+          bearing: Number(camera.bearing || -18),
+          maxPitch: Number(camera.maxPitch || 72),
+          minZoom: Number(camera.minZoom || 11),
+          maxZoom: Number(camera.maxZoom || 16.8),
+          attributionControl: false,
+          dragRotate: true,
+          touchPitch: true
+        };
+
+        const baseMap = new maplibregl.Map({
+          container: baseNode,
+          ...mapOptions
+        });
+
+        const failTimer = window.setTimeout(() => {
+          showFallback("Map loading is taking longer than expected.");
+        }, 10000);
+
+        if (restrictBounds && maxBounds) {
+          baseMap.setMaxBounds(maxBounds);
+        }
+
+        let overlayRef = null;
+        const onMapLoaded = () => {
+          range.addEventListener("input", () => {
+            opacityValue = clamp(Number(range.value), 0, 100);
+            setOverlayOpacity(baseMap, overlayRef, opacityValue);
+          });
+
+          window.clearTimeout(failTimer);
+          hideLoading();
+          if (fallback instanceof HTMLElement) {
+            fallback.hidden = true;
+          }
+        };
+
+        baseMap.on("load", () => {
+          applyInitialViewFromBounds(baseMap, bounds, camera);
+          addTerrain(baseMap, sceneConfig, mapApiKey);
+          addAoiLayers(baseMap, sceneConfig);
+          overlayRef = addOverlayLayer(baseMap, sceneConfig, opacityValue);
+
+          if (typeof maplibregl.NavigationControl === "function") {
+            baseMap.addControl(
+              new maplibregl.NavigationControl({
+                showCompass: true,
+                showZoom: true,
+                visualizePitch: true
+              }),
+              "top-left"
+            );
+          }
+
+          onMapLoaded();
+        });
+      };
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) {
+              return;
+            }
+
+            observer.disconnect();
+            void loadInteractiveMap();
+          },
+          {
+            rootMargin: "160px 0px"
+          }
+        );
+
+        observer.observe(root);
+      } else {
+        void loadInteractiveMap();
+      }
+    });
+  })();
+</script>

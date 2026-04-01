@@ -1,0 +1,180 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  lang="en"
+  title="Pluvii | Page not found"
+  description="The page you are looking for is not available. Use this page to get back to Pluvii."
+>
+  <section class="not-found shell">
+    <div class="not-found-card">
+      <p class="not-found-code">404</p>
+      <h1>The page flowed somewhere else.</h1>
+      <p class="not-found-lead">
+        The link may be outdated, or the page may have moved while we were working on the site.
+        Start from one of these routes.
+      </p>
+
+      <div class="not-found-actions">
+        <a class="button button-primary" href="/en/">Go to English Home</a>
+        <a class="button button-secondary" href="/sk/">Prejst na Slovensky Domov</a>
+      </div>
+
+      <div class="not-found-links">
+        <a href="/en/who-its-for/farmers/">For Farmers</a>
+        <a href="/en/projects/">Projects</a>
+        <a href="/en/blog/">Blog</a>
+        <a href="/en/#contact-form">Contact</a>
+      </div>
+
+      <div class="not-found-pond" aria-hidden="true">
+        <div class="not-found-droplet"></div>
+        <div class="not-found-ripple not-found-ripple-one"></div>
+        <div class="not-found-ripple not-found-ripple-two"></div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding: 3.2rem 0 4rem;
+  }
+
+  .not-found-card {
+    width: min(48rem, 100%);
+    margin: 0 auto;
+    padding: 2rem 1.4rem 2.2rem;
+    border-radius: 1.3rem;
+    border: 1px solid rgba(23, 34, 38, 0.14);
+    background:
+      radial-gradient(circle at 14% 8%, rgba(121, 216, 243, 0.28), transparent 36%),
+      radial-gradient(circle at 85% 92%, rgba(164, 227, 142, 0.26), transparent 44%),
+      rgba(252, 246, 234, 0.9);
+    box-shadow: 0 18px 44px rgba(30, 30, 30, 0.1);
+    text-align: center;
+  }
+
+  .not-found-code {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: #2f5968;
+    font-weight: 700;
+  }
+
+  .not-found-card h1 {
+    margin: 0.7rem auto 0;
+    max-width: 14ch;
+    font-size: clamp(2rem, 7vw, 3.9rem);
+    line-height: 0.95;
+  }
+
+  .not-found-lead {
+    margin: 0.95rem auto 0;
+    max-width: 56ch;
+    color: #445055;
+    line-height: 1.6;
+  }
+
+  .not-found-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.72rem;
+    flex-wrap: wrap;
+  }
+
+  .not-found-links {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .not-found-links a {
+    color: #42535a;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.16em;
+    text-decoration-color: rgba(24, 30, 33, 0.2);
+  }
+
+  .not-found-pond {
+    position: relative;
+    margin: 1.5rem auto 0;
+    width: 9rem;
+    height: 5.1rem;
+  }
+
+  .not-found-droplet {
+    position: absolute;
+    left: 50%;
+    top: 1.5rem;
+    z-index: 2;
+    width: 1.08rem;
+    height: 1.42rem;
+    border-radius: 50% 50% 56% 56%;
+    clip-path: path("M 8 0 C 3 2 0 6 0 10 C 0 14.5 3.5 18 8 18 C 12.5 18 16 14.5 16 10 C 16 6 13 2 8 0 Z");
+    transform: translateX(-50%);
+    transform-origin: 50% 55%;
+    background: linear-gradient(180deg, #8be2ff 0%, #2b9ad1 100%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    animation: droplet-bob 1.6s ease-in-out infinite;
+  }
+
+  .not-found-ripple {
+    position: absolute;
+    left: 50%;
+    top: 2.35rem;
+    z-index: 1;
+    width: 4.2rem;
+    height: 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(21, 78, 108, 0.35);
+    transform: translateX(-50%) scale(0.58);
+    opacity: 1;
+    animation: ripple 1.6s ease-out infinite;
+  }
+
+  .not-found-ripple-two {
+    animation-delay: 0.8s;
+  }
+
+  @keyframes droplet-bob {
+    0% {
+      transform: translateX(-50%) translateY(-0.35rem) scale(0.97, 1.02);
+    }
+
+    45% {
+      transform: translateX(-50%) translateY(0.24rem) scale(1.02, 0.95);
+    }
+
+    62% {
+      transform: translateX(-50%) translateY(0.06rem) scale(0.99, 1.01);
+    }
+
+    100% {
+      transform: translateX(-50%) translateY(-0.35rem) scale(0.97, 1.02);
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: translateX(-50%) scale(0.58);
+      opacity: 0;
+    }
+
+    22% {
+      opacity: 0.7;
+    }
+
+    100% {
+      transform: translateX(-50%) scale(1.26);
+      opacity: 0;
+    }
+  }
+</style>

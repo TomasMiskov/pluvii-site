@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Las Grullas flow accumulation preview</title>
+  <desc id="desc">Static preview based on the KMZ flow accumulation overlay.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e4f4fb" />
+      <stop offset="100%" stop-color="#d2edc8" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)" />
+  <image href="/maps/las-grullas/flow-accumulation.png" x="180" y="80" width="920" height="560" preserveAspectRatio="xMidYMid meet" opacity="0.95" />
+  <text x="56" y="86" font-family="Inter, Arial, sans-serif" font-size="44" fill="#15475f" opacity="0.9">Las Grullas KMZ Layer Loading...</text>
+</svg>

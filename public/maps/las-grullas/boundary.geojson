@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "KMZ Flow Accumulation Extent"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-5.737278, 36.725613],
+            [-5.726695, 36.725613],
+            [-5.726695, 36.734467],
+            [-5.737278, 36.734467],
+            [-5.737278, 36.725613]
+          ]
+        ]
+      }
+    }
+  ]
+}

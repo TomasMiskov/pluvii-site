@@ -5,56 +5,401 @@ import { copy, isLanguage, languages, type Language } from "../../../data/site";
 type Audience = "landowners" | "farmers" | "municipalities";
 const audienceIds: Audience[] = ["landowners", "farmers", "municipalities"];
 
+type AudienceCard = {
+  title: string;
+  body: string;
+};
+
+type AudiencePageContent = {
+  heroTitle: string;
+  heroBody: string;
+  contextTitle: string;
+  contextBody: string;
+  outcomesTitle: string;
+  outcomes: AudienceCard[];
+  servicesTitle: string;
+  services: AudienceCard[];
+  processTitle: string;
+  process: AudienceCard[];
+  deliverablesTitle: string;
+  deliverables: string[];
+  ctaTitle: string;
+  ctaBody: string;
+  ctaLabel: string;
+};
+
 const audienceContent: Record<
   Language,
-  Record<
-    Audience,
-    {
-      title: string;
-      body: string;
-      placeholderTitle: string;
-      placeholderBody: string;
-    }
-  >
+  Record<Audience, AudiencePageContent>
 > = {
   en: {
     landowners: {
-      title: "For Land Owners",
-      body: "Placeholder page for private and family landowners who want practical guidance on water retention and land regeneration.",
-      placeholderTitle: "Audience page in progress",
-      placeholderBody: "We will add concrete examples, expected deliverables, and a typical first-step workflow for landowners."
+      heroTitle: "For Land Owners",
+      heroBody: "You want clear, practical steps for restoring water function on your land without guesswork. Pluvii helps you see what is happening now and where interventions have the highest effect.",
+      contextTitle: "What this solves for you",
+      contextBody: "This page is structured as a working template. Replace each section with your specific audience copy, examples, and project details as they evolve.",
+      outcomesTitle: "Key outcomes",
+      outcomes: [
+        {
+          title: "See where water concentrates",
+          body: "We map flow paths, pooling zones, and pressure points so decisions are based on your terrain."
+        },
+        {
+          title: "Prioritize interventions",
+          body: "We identify where small and medium retention measures can create practical ecological gains."
+        },
+        {
+          title: "Reduce uncertainty",
+          body: "You get a clearer sequence of what to do first, what can wait, and what is likely to perform."
+        }
+      ],
+      servicesTitle: "What Pluvii does for land owners",
+      services: [
+        {
+          title: "Site water-behavior analysis",
+          body: "Assessment of terrain, runoff behavior, and current weak points in water retention."
+        },
+        {
+          title: "Retention concept map",
+          body: "Map-based guidance on measure placement, with rationale tied to your land conditions."
+        },
+        {
+          title: "Decision support for implementation",
+          body: "Practical direction for sequencing and discussing options with contractors or partners."
+        }
+      ],
+      processTitle: "Typical collaboration flow",
+      process: [
+        {
+          title: "1. Intake and site context",
+          body: "We collect your objectives, available data, and relevant land constraints."
+        },
+        {
+          title: "2. Analysis and map outputs",
+          body: "We produce the core map layers and identify priority intervention zones."
+        },
+        {
+          title: "3. Action recommendations",
+          body: "You receive concise recommendations and next steps for practical implementation."
+        }
+      ],
+      deliverablesTitle: "Typical deliverables",
+      deliverables: [
+        "Water movement and accumulation map for your site",
+        "Priority areas for retention measures",
+        "Short written recommendation with implementation order",
+        "Follow-up call to review options and tradeoffs"
+      ],
+      ctaTitle: "Discuss your land",
+      ctaBody: "If you have a site in mind, share basic details and we can scope the right starting point.",
+      ctaLabel: "Start a conversation"
     },
     farmers: {
-      title: "For Farmers",
-      body: "Placeholder page for farmers who want resilient water systems that support long-term soil health and production stability.",
-      placeholderTitle: "Audience page in progress",
-      placeholderBody: "We will add farming-specific outcomes, suitable interventions, and planning considerations for active operations."
+      heroTitle: "For Farmers",
+      heroBody: "You need water retention that supports resilient production, soil health, and day-to-day farm realities. Pluvii helps you plan interventions that fit operational constraints.",
+      contextTitle: "What this solves for you",
+      contextBody: "Use this as a modular template page. Each section can be replaced with crop- and region-specific guidance later.",
+      outcomesTitle: "Key outcomes",
+      outcomes: [
+        {
+          title: "Stabilize water on working land",
+          body: "Map where runoff losses occur and where retention features can improve infiltration."
+        },
+        {
+          title: "Protect soil function",
+          body: "Reduce erosion risk and strengthen soil moisture conditions in critical zones."
+        },
+        {
+          title: "Plan with operational constraints",
+          body: "Design recommendations account for machinery access, field edges, and farm workflow."
+        }
+      ],
+      servicesTitle: "What Pluvii does for farmers",
+      services: [
+        {
+          title: "Field-scale hydrology screening",
+          body: "Assessment focused on productive land, runoff patterns, and vulnerable areas."
+        },
+        {
+          title: "Intervention placement guidance",
+          body: "Where specific retention interventions are likely to bring best return for effort."
+        },
+        {
+          title: "Implementation sequencing",
+          body: "A staged rollout path that can match seasonal farm operations."
+        }
+      ],
+      processTitle: "Typical collaboration flow",
+      process: [
+        {
+          title: "1. Farm context intake",
+          body: "We gather your field constraints, production context, and current pain points."
+        },
+        {
+          title: "2. Map and intervention analysis",
+          body: "We evaluate where water leaves too fast and where retention has strongest leverage."
+        },
+        {
+          title: "3. Practical action plan",
+          body: "You get prioritized measures that are realistic for active farm management."
+        }
+      ],
+      deliverablesTitle: "Typical deliverables",
+      deliverables: [
+        "Runoff and accumulation map over your farm area",
+        "Priority list of intervention zones by expected impact",
+        "Notes on constraints and operational fit",
+        "Recommended phasing for implementation"
+      ],
+      ctaTitle: "Talk through your farm context",
+      ctaBody: "Share your location and farming context, and we can recommend the most useful first analysis.",
+      ctaLabel: "Request a first review"
     },
     municipalities: {
-      title: "For Municipalities",
-      body: "Placeholder page for municipal teams planning landscape-scale retention and restoration across public land and shared catchments.",
-      placeholderTitle: "Audience page in progress",
-      placeholderBody: "We will add collaboration models, project scopes, and implementation paths for municipal and regional contexts."
+      heroTitle: "For Municipalities",
+      heroBody: "You need retention planning that works across parcels, stakeholders, and public priorities. Pluvii helps municipal teams identify high-impact water interventions with clear spatial logic.",
+      contextTitle: "What this solves for you",
+      contextBody: "This page is a template for municipal messaging. You can later tailor examples by watershed scale, policy context, and implementation model.",
+      outcomesTitle: "Key outcomes",
+      outcomes: [
+        {
+          title: "Coordinate decisions across territory",
+          body: "Use common map outputs to align teams, landholders, and project partners."
+        },
+        {
+          title: "Prioritize public investment",
+          body: "Identify zones where retention measures can reduce runoff stress and improve resilience."
+        },
+        {
+          title: "Prepare implementation pathways",
+          body: "Translate analysis into phased intervention areas suitable for procurement and planning."
+        }
+      ],
+      servicesTitle: "What Pluvii does for municipalities",
+      services: [
+        {
+          title: "Catchment-informed site analysis",
+          body: "Water movement analysis that supports decisions beyond individual parcels."
+        },
+        {
+          title: "Priority intervention mapping",
+          body: "Map-led ranking of areas with strongest restoration and risk-reduction potential."
+        },
+        {
+          title: "Planning support package",
+          body: "Clear visual and written outputs for internal alignment and partner communication."
+        }
+      ],
+      processTitle: "Typical collaboration flow",
+      process: [
+        {
+          title: "1. Scope and objectives",
+          body: "We define territory, constraints, and implementation priorities with your team."
+        },
+        {
+          title: "2. Analysis and prioritization",
+          body: "We map hydrological behavior and identify intervention opportunity zones."
+        },
+        {
+          title: "3. Action framing",
+          body: "You receive a phased map-based framework to guide next planning steps."
+        }
+      ],
+      deliverablesTitle: "Typical deliverables",
+      deliverables: [
+        "Area-wide water behavior and accumulation maps",
+        "Priority zones grouped by intervention potential",
+        "Concise planning brief for stakeholder alignment",
+        "Recommended phased rollout structure"
+      ],
+      ctaTitle: "Explore municipal application",
+      ctaBody: "Share your territory and planning goals, and we will propose a fit-for-purpose starting scope.",
+      ctaLabel: "Plan a scoping call"
     }
   },
   sk: {
     landowners: {
-      title: "Pre Vlastnikov Pozemkov",
-      body: "Docasna stranka pre sukromnych vlastnikov pozemkov, ktori hladaju prakticky postup pri zadrzani vody a regeneracii krajiny.",
-      placeholderTitle: "Stranka je vo priprave",
-      placeholderBody: "Doplnime sem konkretne priklady, vystupy spoluprace a bezny uvodny postup pre vlastnikov."
+      heroTitle: "Pre Vlastnikov Pozemkov",
+      heroBody: "Hladate jasny a prakticky postup, ako zlepsit zadrzanie vody na svojom pozemku. Pluvii ukaze, co sa na uzemi deje a kde maju opatrenia najvacsi efekt.",
+      contextTitle: "Co vam to riesi",
+      contextBody: "Tato stranka je zostavena ako pracovna sablona. Kazdu sekciu mozete neskor doplnit o konkretne priklady a vystupy.",
+      outcomesTitle: "Hlavne vysledky",
+      outcomes: [
+        {
+          title: "Uvidite, kde sa voda zhromazduje",
+          body: "Mapujeme trasy odtoku, miesta akumulacie a kriticke body na zaklade realneho terenu."
+        },
+        {
+          title: "Viete priorizovat opatrenia",
+          body: "Ukazeme, kde mensie aj stredne zasahy davaju najvacsi ekologicky zmysel."
+        },
+        {
+          title: "Znizite neistotu pri rozhodovani",
+          body: "Dostanete jasnejsi sled krokov: co riesit hned a co moze pockat."
+        }
+      ],
+      servicesTitle: "Co pre vas robi Pluvii",
+      services: [
+        {
+          title: "Analyza spravania vody na lokalite",
+          body: "Posudenie terenu, odtoku a sucasnych slabych miest v retencii vody."
+        },
+        {
+          title: "Mapovy navrh retencnych opatreni",
+          body: "Odporucania umiestnenia opatreni s odovodnenim podla podmienok na pozemku."
+        },
+        {
+          title: "Podpora rozhodnutia pre realizaciu",
+          body: "Prakticke usmernenie pre poradie krokov a diskusiu s realizacnymi partnermi."
+        }
+      ],
+      processTitle: "Typicky priebeh spoluprace",
+      process: [
+        {
+          title: "1. Uvod a kontext pozemku",
+          body: "Spresnime ciele, dostupne podklady a dolezite limity uzemia."
+        },
+        {
+          title: "2. Analyza a mapove vystupy",
+          body: "Pripravime klucove vrstvy a oznacime priority pre zasahy."
+        },
+        {
+          title: "3. Odporucane dalsie kroky",
+          body: "Dostanete zhrnutie odporucani a postup pre prakticku realizaciu."
+        }
+      ],
+      deliverablesTitle: "Typicke vystupy",
+      deliverables: [
+        "Mapa pohybu vody a akumulacie na pozemku",
+        "Prioritne zony pre retencne opatrenia",
+        "Strucne odporucanie s poradi krokov",
+        "Nasledny konzultacny hovor k moznostiam"
+      ],
+      ctaTitle: "Preberme vas pozemok",
+      ctaBody: "Poslite zakladne informacie o lokalite a navrhneme vhodny uvodny krok.",
+      ctaLabel: "Zacat konzultaciu"
     },
     farmers: {
-      title: "Pre Farmarov",
-      body: "Docasna stranka pre farmarov, ktori chcu posilnit odolnost hospodarenia cez lepsie hospodarenie s vodou a stav pody.",
-      placeholderTitle: "Stranka je vo priprave",
-      placeholderBody: "Doplnime sem farmarske scenare, vhodne opatrenia a prakticke kroky pre fungujucu prevadzku."
+      heroTitle: "Pre Farmarov",
+      heroBody: "Potrebujete retencne opatrenia, ktore podporia odolnu produkciu, zdravie pody a realnu prevadzku farmy. Pluvii pomaha navrhnut kroky, ktore su prakticky realizovatelne.",
+      contextTitle: "Co vam to riesi",
+      contextBody: "Sekcie su navrhnute ako sablona, ktoru mozete neskor doplnit o region-specificke scenare a priklady z praxe.",
+      outcomesTitle: "Hlavne vysledky",
+      outcomes: [
+        {
+          title: "Stabilnejsi vodny rezim na produkcnej pode",
+          body: "Mapujeme, kde voda odteka prilis rychlo a kde ma zmysel ju zachytit."
+        },
+        {
+          title: "Lepse podmienky pre podu",
+          body: "Znizenie rizika erozie a podpora vlhkostneho rezimu v kritickych castiach pola."
+        },
+        {
+          title: "Respektovanie prevadzkovych limitov",
+          body: "Navrhy beru do uvahy pristup techniky, hranice poli a rytmus sezony."
+        }
+      ],
+      servicesTitle: "Co pre farmarov robi Pluvii",
+      services: [
+        {
+          title: "Hydrologicky screening na urovni poli",
+          body: "Analyza orientovana na produkcne plochy, odtok a zranitelne miesta."
+        },
+        {
+          title: "Odporucania umiestnenia opatreni",
+          body: "Kde retencne zasahy pravdepodobne prinesu najlepsi efekt."
+        },
+        {
+          title: "Navrh postupnej implementacie",
+          body: "Fazovanie krokov tak, aby pasovalo do beznej prevadzky farmy."
+        }
+      ],
+      processTitle: "Typicky priebeh spoluprace",
+      process: [
+        {
+          title: "1. Zber kontextu hospodarenia",
+          body: "Prejdeme limity poli, ciele a hlavne bolestive miesta."
+        },
+        {
+          title: "2. Analyza map a ziaducich zasahov",
+          body: "Vyhodnotime klucove miesta odtoku a retencny potencial."
+        },
+        {
+          title: "3. Prakticky plan realizacie",
+          body: "Dostanete prioritny zoznam opatreni pre realnu prevadzku."
+        }
+      ],
+      deliverablesTitle: "Typicke vystupy",
+      deliverables: [
+        "Mapa odtoku a akumulacie pre farmarske uzemie",
+        "Prioritny zoznam miest podla dopadu",
+        "Poznamky k prevadzkovym obmedzeniam",
+        "Navrh fazovania realizacie"
+      ],
+      ctaTitle: "Prediskutujme vasu farmu",
+      ctaBody: "Poslite lokalitu a kontext hospodarenia, navrhneme najvhodnejsiu uvodnu analyzu.",
+      ctaLabel: "Poziadat o uvodny prehlad"
     },
     municipalities: {
-      title: "Pre Samospravy",
-      body: "Docasna stranka pre samospravy, ktore pripravuju retencne a obnovne opatrenia vo vacsom uzemnom kontexte.",
-      placeholderTitle: "Stranka je vo priprave",
-      placeholderBody: "Doplnime sem modely spoluprace, rozsahy projektov a postupy implementacie pre obce a regiony."
+      heroTitle: "Pre Samospravy",
+      heroBody: "Potrebujete planovanie retencie vody, ktore funguje napriec uzemim, vlastnictvom a verejnymi prioritami. Pluvii pomaha urcit najdolezitejsie zasahy s jasnou mapovou logikou.",
+      contextTitle: "Co vam to riesi",
+      contextBody: "Stranka je sablona pre municipalne vyuzitie. Obsah mozete neskor doplnit o konkretne povodia, projekty a modely realizacie.",
+      outcomesTitle: "Hlavne vysledky",
+      outcomes: [
+        {
+          title: "Lepse zosuladenie rozhodnuti",
+          body: "Spolocne mapove podklady ulahcia koordinaciu medzi timami a partnermi."
+        },
+        {
+          title: "Jasnejsia priorizacia investicii",
+          body: "Identifikujeme zony s vysokym potencialom pre retencne opatrenia."
+        },
+        {
+          title: "Priprava na realizaciu",
+          body: "Analyzy prelozime do fazovaneho postupu vhodneho pre planovanie a verejne procesy."
+        }
+      ],
+      servicesTitle: "Co pre samospravy robi Pluvii",
+      services: [
+        {
+          title: "Analyza v kontexte povodia",
+          body: "Posudenie pohybu vody v rozsahu, ktory presahuje jednotlive parcely."
+        },
+        {
+          title: "Mapa prioritnych zasahov",
+          body: "Mapove zoradenie uzemi podla potencialu dopadu."
+        },
+        {
+          title: "Podporny planovaci balik",
+          body: "Vizualne a textove vystupy na interne zosuladenie a komunikaciu."
+        }
+      ],
+      processTitle: "Typicky priebeh spoluprace",
+      process: [
+        {
+          title: "1. Definovanie rozsahu a cielov",
+          body: "Upresnime uzemie, limity a priority realizacie."
+        },
+        {
+          title: "2. Analyza a priorizacia",
+          body: "Zmapujeme hydrologicke spravanie a navrhneme prioritne zony."
+        },
+        {
+          title: "3. Ramec dalsich krokov",
+          body: "Dostanete fazovany mapovy navrh pre pokracovanie pripravy."
+        }
+      ],
+      deliverablesTitle: "Typicke vystupy",
+      deliverables: [
+        "Mapy pohybu vody a akumulacie pre riesene uzemie",
+        "Prioritne zony podla retencneho potencialu",
+        "Strucny planovaci podklad pre stakeholderov",
+        "Odporucana fazacia realizacie"
+      ],
+      ctaTitle: "Preberme vas uzemny kontext",
+      ctaBody: "Poslite zakladne informacie o uzemi a cieloch, navrhneme vhodny uvodny rozsah.",
+      ctaLabel: "Dohodnut scoping call"
     }
   }
 };
@@ -78,24 +423,112 @@ if (!lang || !isLanguage(lang) || !audience || !audienceIds.includes(audience as
 const typedAudience = audience as Audience;
 const t = copy[lang];
 const page = audienceContent[lang][typedAudience];
+const heroImage = "/maps/las-grullas/preview.svg";
+const galleryImages = ["/maps/las-grullas/flow-accumulation.png", "/maps/demo/preview.svg"];
 ---
 
 <BaseLayout lang={lang} title={`Pluvii | ${t.nav.whoItsFor} | ${t.nav[typedAudience]}`}>
-  <section class="page-hero shell">
-    <div class="page-hero-panel">
-      <p class="eyebrow">{t.nav.whoItsFor}</p>
-      <h1>{page.title}</h1>
-      <p class="lead">{page.body}</p>
+  <section class="audience-hero shell">
+    <div class="audience-hero-stack">
+      <p class="audience-kicker">
+        {t.nav.whoItsFor} / {t.nav[typedAudience]}
+      </p>
+      <h1>{page.heroTitle}</h1>
+      <p class="lead">{page.heroBody}</p>
+      <figure class="audience-media audience-media-hero">
+        <img src={heroImage} alt="Landscape preview map." loading="lazy" />
+      </figure>
+      <div class="audience-hero-actions">
+        <a class="button button-primary" href={`/${lang}/#contact-form`}>
+          {page.ctaLabel}
+        </a>
+        <a class="audience-hero-link" href="#audience-services">
+          {page.servicesTitle}
+        </a>
+      </div>
     </div>
   </section>
 
-  <section class="section shell">
-    <div class="content-list">
-      <article class="list-item">
-        <h2>{page.placeholderTitle}</h2>
-        <p>{page.placeholderBody}</p>
+  <section class="section shell audience-section" id="audience-services">
+    <div class="audience-panel audience-context">
+      <h2>{page.contextTitle}</h2>
+      <p>{page.contextBody}</p>
+    </div>
+  </section>
+
+  <section class="section shell audience-section">
+    <div class="audience-panel">
+      <h2>{page.outcomesTitle}</h2>
+      <div class="audience-media-row">
+        {galleryImages.map((imagePath) => (
+          <figure class="audience-media">
+            <img src={imagePath} alt="Project placeholder visual." loading="lazy" />
+          </figure>
+        ))}
+      </div>
+      <div class="audience-list">
+        {page.outcomes.map((item) => (
+          <article class="audience-item">
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell audience-section">
+    <div class="audience-panel">
+      <h2>{page.servicesTitle}</h2>
+      <div class="audience-list">
+        {page.services.map((item) => (
+          <article class="audience-item">
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell audience-section">
+    <div class="audience-panel">
+      <h2>{page.processTitle}</h2>
+      <ol class="audience-process">
+        {page.process.map((step) => (
+          <li class="audience-process-item">
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section shell audience-section">
+    <div class="audience-panel audience-deliverables">
+      <h2>{page.deliverablesTitle}</h2>
+      <ul>
+        {page.deliverables.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <figure class="audience-media">
+        <img src={galleryImages[0]} alt="Water accumulation overlay preview." loading="lazy" />
+      </figure>
+    </div>
+  </section>
+
+  <section class="section shell audience-section">
+    <div class="audience-panel audience-cta">
+      <h2>{page.ctaTitle}</h2>
+      <p>{page.ctaBody}</p>
+      <a class="button button-primary" href={`/${lang}/#contact-form`}>
+        {page.ctaLabel}
+      </a>
+      <p class="audience-cta-link">
         <a href={`/${lang}/#contact-form`}>{t.nav.contact}</a>
-      </article>
+      </p>
     </div>
   </section>
 </BaseLayout>

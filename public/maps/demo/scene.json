@@ -1,0 +1,27 @@
+{
+  "id": "demo-landscape",
+  "title": "Demo landscape",
+  "camera": {
+    "center": [17.1135, 48.1425],
+    "zoom": 13.6,
+    "pitch": 58,
+    "bearing": -20,
+    "minZoom": 11.5,
+    "maxZoom": 16.5,
+    "maxPitch": 72
+  },
+  "bounds": [17.08, 48.12, 17.15, 48.17],
+  "style": {
+    "maptilerStyleId": "outdoor-v2",
+    "terrainExaggeration": 1.16
+  },
+  "boundaryUrl": "/maps/demo/boundary.geojson",
+  "maskUrl": "/maps/demo/mask.geojson",
+  "overlay": {
+    "type": "geojson-heat",
+    "url": "/maps/demo/overlay.geojson",
+    "valueProperty": "accumulation",
+    "min": 0,
+    "max": 1
+  }
+}
